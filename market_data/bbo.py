@@ -1,3 +1,5 @@
+from .const import str_time_from_timestamp
+
 TP_TOP_OF_BOOK_NWBBO = 0x001B
 TP_TOP_OF_BOOK_NWBBO_FULL = 0x001A
 TP_TOP_OF_BOOK_BBO_WV = 0x0018
@@ -42,6 +44,19 @@ class BBO(object):
         ask_volume = int.from_bytes(data[32:36], byteorder='little', signed=False)
         return BBO(protocol_type, message_type, symbol_id, t2, bid_volume, bid_price, ask_price, ask_volume)
 
-    @property
-    def delta(self):
-        return self._manager.get_delta_message()
+    # @property
+    # def delta(self):
+    #     return self._manager.get_delta_message()
+
+    def __eq__(self, other):
+        return self.bid_volume == other.bid_volume and self.bid_price == other.bid_price and \
+               self.ask_price == other.ask_price and self.ask_volume == other.ask_volume
+
+    def __repr__(self):
+        res = ""
+        res += 'bid: {} '.format(self.bid_price)
+        res += 'ask: {} '.format(self.ask_price)
+        res += 'bid_vol: {} '.format(self.bid_volume)
+        res += 'ask_vol: {} '.format(self.ask_volume)
+        res += 'T={}'.format(str_time_from_timestamp(self.t2))
+        return res
