@@ -1,4 +1,4 @@
-from .const import DATA_SIZE
+from .common import DATA_SIZE
 from .bbo import BBO
 
 

@@ -1,4 +1,4 @@
-from .const import str_time_from_timestamp
+from .common import str_time_from_timestamp
 
 TP_TOP_OF_BOOK_NWBBO = 0x001B
 TP_TOP_OF_BOOK_NWBBO_FULL = 0x001A

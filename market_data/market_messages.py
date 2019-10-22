@@ -1,6 +1,6 @@
 from copy import copy
 from collections import deque
-from .const import DATA_SIZE, MAX_LATENCY_TIME
+from .common import DATA_SIZE, MAX_LATENCY_TIME
 from .order import Order
 
 

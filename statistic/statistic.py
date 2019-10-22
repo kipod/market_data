@@ -1,4 +1,4 @@
-from market_data.const import str_time_from_timestamp
+from market_data.common import str_time_from_timestamp
 
 class Statistic(object):
     def __init__(self, file_name: str = 'out.csv'):

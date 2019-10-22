@@ -1,5 +1,5 @@
 from copy import copy
-from .const import str_time_from_timestamp
+from .common import str_time_from_timestamp
 # new
 TP_ADD_ORDER_BUY_LONG = 0x0001
 TP_ADD_ORDER_SELL_LONG = 0x0002
