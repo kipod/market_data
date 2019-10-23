@@ -19,7 +19,18 @@ class MarketMessages(object):
     def is_match(self, order, bbo) -> bool:
         assert self and order and bbo
         self.update_gen_bbo(order)
+        delta = bbo.t2 - order.t2
+        if delta > MAX_LATENCY_TIME:
+            return False
+
         return self.gen_bbo == bbo
+
+        # for debug
+        # if self.gen_bbo == bbo:
+        #     if delta > 10**9:
+        #         return True
+        #     return True
+        # return False
 
     def find_match_message(self, bbo):
         if self.gen_bbo is None:
@@ -42,6 +53,8 @@ class MarketMessages(object):
 
         # search in queue
         for order in self.__messages:
+            if order.t2 > bbo.t2:
+                return None
             if self.is_match(order, bbo):
                 self.__last_matched_message_t2 = order.t2
                 self.gen_bbo = bbo

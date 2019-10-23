@@ -2,7 +2,7 @@ from market_data.common import str_time_from_timestamp, time_from_timestamp, tim
 from .interval import Interval
 from datetime import time
 
-INTERVAL_SECONDS = 60 * 60
+INTERVAL_SECONDS = 30
 
 
 class Output(object):
