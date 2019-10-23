@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, time
 
 DATA_SIZE = 8 + 8 + 4 + (4 * 4)
 
@@ -16,3 +16,7 @@ def str_time_from_timestamp(timestamp: int) -> str:
     s = dt.strftime('%H:%M:%S')
     s += '.' + str(int(timestamp % ONE_SEC_IN_NANOSECOND)).zfill(9)
     return s
+
+
+def time_in_seconds(t: time):
+    return t.second + t.minute*60 + t.hour*60*60
