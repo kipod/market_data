@@ -68,6 +68,21 @@ MODIFY_ORDER_TYPE = (
     TP_EXEC_ORDER_WREMAINING_FULL
 )
 
+ATTRIBUTE_ORDER_TYPE = (
+    TP_ADD_ORDER_ATTR_BUY_LONG,
+    TP_ADD_ORDER_ATTR_SELL_LONG,
+    TP_ADD_ORDER_ATTR_FULL
+)
+
+EXECUTE_TYPE = (
+    TP_EXEC_ORDER_NP_FV,
+    TP_EXEC_ORDER_NP_LV,
+    TP_EXEC_ORDER_LP_LV,
+    TP_EXEC_ORDER_FP_FV,
+    TP_EXEC_ORDER_WREMAINING_LONG,
+    TP_EXEC_ORDER_WREMAINING_FULL,
+)
+
 
 class Order(object):
     _manager = None
@@ -124,17 +139,22 @@ class Order(object):
             self._manager.del_order(self.order_id)
         elif self.message_type in MODIFY_ORDER_TYPE:
             order = self._manager.order_by_id(self.order_id)
+            if order:
+                self.origin = copy(order)
+                if self.size:
+                    order.size = self.size
+                if self.price:
+                    order.price = self.price
+        elif self.message_type in ATTRIBUTE_ORDER_TYPE:
+            order = Order._manager.order_by_id(self.order_id)
             self.origin = copy(order)
-            if self.size:
-                order.size = self.size
-            if self.price:
-                order.price = self.price
+            pass
         else:
-            assert False, 'Unknown message type'
+            assert False, 'Unknown order command: {}'.format(self)
         pass
 
     def __repr__(self):
-        action = '???'
+        action = str(self.message_type)
 
         if self.message_type in NEW_ORDER_TYPES:
             action = 'NEW'
@@ -143,7 +163,7 @@ class Order(object):
         elif self.message_type in MODIFY_ORDER_TYPE:
             action = 'EDIT'
         return "{} side: {} size:{} price:{} T={}".format(
-            action, self.side, self.size, self.price, str_time_from_timestamp(self.t2)
+            action, self.side, self.size, self.price, str_time_from_timestamp(self.t2, True)
         )
 
     def get_update_bbo(self, current_bbo):
@@ -172,28 +192,39 @@ class Order(object):
                     return current_bbo.ask_price, current_bbo.ask_volume,\
                            current_bbo.bid_price, current_bbo.bid_volume - self.size//100
         elif self.message_type in MODIFY_ORDER_TYPE:
-            if self.side == 'S':
-                if current_bbo.ask_price == self.price and self.price == self.origin.price:
-                    return current_bbo.ask_price, current_bbo.ask_volume + (self.size - self.origin.size)//100,\
-                           current_bbo.bid_price, current_bbo.bid_volume
-                elif current_bbo.ask_price == self.origin.price and current_bbo.ask_price > self.price:
-                    return self.price, self.size//100,\
-                           current_bbo.bid_price, current_bbo.bid_volume
-                elif current_bbo.ask_price == self.origin.price and current_bbo.ask_price < self.price:
-                    return current_bbo.ask_price, current_bbo.ask_volume - self.origin.size//100, \
-                           current_bbo.bid_price, current_bbo.bid_volume
-            else:
-                if current_bbo.bid_price == self.price and self.price == self.origin.price:
-                    return current_bbo.ask_price, current_bbo.ask_volume,\
-                           current_bbo.bid_price, current_bbo.bid_volume + (self.size - self.origin.size)//100
-                elif current_bbo.bid_price == self.origin.price and current_bbo.bid_price < self.price:
-                    return current_bbo.ask_price, current_bbo.ask_volume, \
-                           self.price, self.size // 100
-                elif current_bbo.bid_price == self.origin.price and current_bbo.bid_price < self.price:
-                    return current_bbo.ask_price, current_bbo.ask_volume, \
-                           current_bbo.bid_price, current_bbo.bid_volume - self.origin.size // 100
+            if self.origin is not None:
+                if self.side == 'S':
+                    if current_bbo.ask_price == self.price and self.price == self.origin.price:
+                        return current_bbo.ask_price, current_bbo.ask_volume + (self.size - self.origin.size)//100,\
+                               current_bbo.bid_price, current_bbo.bid_volume
+                    elif current_bbo.ask_price == self.origin.price and current_bbo.ask_price > self.price:
+                        return self.price, self.size//100,\
+                               current_bbo.bid_price, current_bbo.bid_volume
+                    elif current_bbo.ask_price == self.origin.price and current_bbo.ask_price < self.price:
+                        return current_bbo.ask_price, current_bbo.ask_volume - self.origin.size//100, \
+                               current_bbo.bid_price, current_bbo.bid_volume
+                else:
+                    if current_bbo.bid_price == self.price and self.price == self.origin.price:
+                        return current_bbo.ask_price, current_bbo.ask_volume,\
+                               current_bbo.bid_price, current_bbo.bid_volume + (self.size - self.origin.size)//100
+                    elif current_bbo.bid_price == self.origin.price and current_bbo.bid_price < self.price:
+                        return current_bbo.ask_price, current_bbo.ask_volume, \
+                               self.price, self.size // 100
+                    elif current_bbo.bid_price == self.origin.price and current_bbo.bid_price < self.price:
+                        return current_bbo.ask_price, current_bbo.ask_volume, \
+                               current_bbo.bid_price, current_bbo.bid_volume - self.origin.size // 100
 
+        elif self.message_type in ATTRIBUTE_ORDER_TYPE:
+            if self.origin:
+                print('Add order attribute')
+                print('order:', self)
+                print('origin:', self.origin)
+                pass
         else:
             assert False
 
         return current_bbo.ask_price, current_bbo.ask_volume, current_bbo.bid_price, current_bbo.bid_volume
+
+    @property
+    def is_execute(self):
+        return self.message_type in EXECUTE_TYPE

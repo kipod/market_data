@@ -16,8 +16,7 @@ class MarketMessages(object):
         Order._manager = self
         self.next_message_from_file = self.___next_message_from_file()
 
-    def is_match(self, order, bbo) -> bool:
-        assert self and order and bbo
+    def is_match_bbo(self, order, bbo) -> bool:
         self.update_gen_bbo(order)
         delta = bbo.t2 - order.t2
         if delta > MAX_LATENCY_TIME:
@@ -32,44 +31,49 @@ class MarketMessages(object):
         #     return True
         # return False
 
-    def find_match_message(self, bbo):
-        if self.gen_bbo is None:
-            self.gen_bbo = bbo
-            return None
-        else:
-            self.prev_gen_bbo = copy(self.gen_bbo)
+    @staticmethod
+    def is_matched_trade(order, trade) -> bool:
+        delta = trade.t2 - order.t2
+        if delta > MAX_LATENCY_TIME:
+            return False
+        return trade == order
 
+    def find_matched_bbo(self, bbo):
+        try:
+            if self.gen_bbo is None:
+                return None
+            else:
+                self.prev_gen_bbo = copy(self.gen_bbo)
+            return self.find_match_message(bbo, self.is_match_bbo)
+        finally:
+            self.gen_bbo = bbo
+
+    def find_matched_trade(self, trade):
+        return self.find_match_message(trade, self.is_matched_trade)
+
+    def find_match_message(self, quote, is_match):
         # remove old messages from queue
         while self.__messages:
             t2 = self.__messages[0].t2
-            if t2 <= self.__last_matched_message_t2 or abs(t2 - bbo.t2) > MAX_LATENCY_TIME:
+            if t2 <= self.__last_matched_message_t2 or abs(t2 - quote.t2) > MAX_LATENCY_TIME:
                 self.__messages.popleft()
             else:
                 break
 
-        # bbo_delta = bbo_message.delta
-        # if bbo_delta is None:
-        #     return None
-
         # search in queue
         for order in self.__messages:
-            if order.t2 > bbo.t2:
+            if order.t2 > quote.t2:
                 return None
-            if self.is_match(order, bbo):
+            if is_match(order, quote):
                 self.__last_matched_message_t2 = order.t2
-                self.gen_bbo = bbo
                 return order
 
         for order in self.next_message_from_file:
-            if order.t2 > bbo.t2:
+            if order.t2 > quote.t2:
                 break
-            if self.is_match(order, bbo):
+            if is_match(order, quote):
                 self.__last_matched_message_t2 = order.t2
-                self.gen_bbo = bbo
                 return order
-
-        # self.gen_bbo = self.prev_gen_bbo
-        self.gen_bbo = bbo
         return None
 
     def ___next_message_from_file(self):
@@ -89,7 +93,8 @@ class MarketMessages(object):
 
     def del_order(self, order_id: int):
         """remove order from book"""
-        del self.orders[order_id]
+        if order_id in self.orders:
+            del self.orders[order_id]
 
     def order_by_id(self, order_id):
         return self.orders[order_id] if order_id in self.orders else None
