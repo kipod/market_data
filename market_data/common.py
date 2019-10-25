@@ -9,6 +9,9 @@ ONE_SEC_IN_NANOSECOND = 1000 * 1000 * 1000
 TIME_ZONE = timezone(timedelta(hours=-4))
 # TIME_ZONE = timezone.utc
 
+# SELECTED_SYMBOL_IDS = (222, )
+SELECTED_SYMBOL_IDS = None
+
 
 def time_from_timestamp(timestamp: int, without_timezone=False) -> datetime:
     return datetime.fromtimestamp(timestamp // ONE_SEC_IN_NANOSECOND, timezone.utc if without_timezone else TIME_ZONE)

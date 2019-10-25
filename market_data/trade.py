@@ -48,7 +48,7 @@ class Trade(object):
 
     def __eq__(self, order):
         if order.is_execute:
-            return self.price == order.price and self.size == order.size
+            return self.price == order.price and self.size == order.size and self.symbol_id == order.symbol_id
         return False
         # return self.bid_volume == other.bid_volume and self.bid_price == other.bid_price and \
         #        self.ask_price == other.ask_price and self.ask_volume == other.ask_volume

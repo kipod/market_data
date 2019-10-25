@@ -58,5 +58,5 @@ class BBO(object):
         res += 'ask: {} '.format(self.ask_price)
         res += 'bid_vol: {} '.format(self.bid_volume)
         res += 'ask_vol: {} '.format(self.ask_volume)
-        res += 'T={}'.format(str_time_from_timestamp(self.t2))
+        res += 'T={}'.format(str_time_from_timestamp(self.t2, True))
         return res

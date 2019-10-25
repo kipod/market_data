@@ -172,16 +172,16 @@ class Order(object):
                 if current_bbo.ask_price == self.price:
                     return current_bbo.ask_price, current_bbo.ask_volume + self.size//100,\
                            current_bbo.bid_price, current_bbo.bid_volume
-                elif current_bbo.ask_price < self.price:
+                elif current_bbo.ask_price > self.price:
                     return self.price, self.size//100,\
                            current_bbo.bid_price, current_bbo.bid_volume
             else:
                 if current_bbo.bid_price == self.price:
                     return current_bbo.ask_price, current_bbo.ask_volume,\
                            current_bbo.bid_price, current_bbo.bid_volume + self.size//100
-                elif current_bbo.bid_price > self.price:
+                elif current_bbo.bid_price < self.price:
                     return current_bbo.ask_price, current_bbo.ask_volume, \
-                           self.price, current_bbo.bid_volume + self.size // 100
+                           self.price, self.size // 100
         elif self.message_type in DELETE_ORDER_TYPES:
             if self.side == 'S':
                 if current_bbo.ask_price == self.price:
