@@ -1,16 +1,10 @@
+#!/bin/python3
 import argparse
 import datetime
 from market_data import BboMessages, MarketMessages, TradeMessages
 from statistic import Output as Stat, DEFAULT_INTERVAL_SECONDS
 from market_data.common import str_time_from_timestamp, SELECTED_SYMBOL_IDS
 
-DEFAULT_MARKET_FILE = r'S:\temp\md\short\market_ARCA__2019_10_15-30.csv.bin'
-DEFAULT_CQS_FILE = r'S:\temp\md\short\CQS_ARCA_P__2019_10_15-30.csv.bin'
-DEFAULT_CTS_FILE = r'S:\temp\md\short\CTS_ARCA__2019_10_15-30.csv.bin'
-
-# DEFAULT_MARKET_FILE = r'S:\temp\md\spy\market_ARCA__2019_10_15-30.csv.bin'
-# DEFAULT_CQS_FILE = r'S:\temp\md\spy\CQS_ARCA_P__2019_10_15-30.csv.bin'
-# DEFAULT_CTS_FILE = r'S:\temp\md\spy\CTS_ARCA__2019_10_15-30.csv.bin'
 DEFAULT_OUT_FILE = 'output.csv'
 
 g_interval = DEFAULT_INTERVAL_SECONDS
@@ -21,6 +15,8 @@ def main():
     parser.add_argument('--market', help='market data file', required=True)
     parser.add_argument('--CQS', help='CQS data file', default=None)
     parser.add_argument('--CTS', help='CTS data file', default=None)
+    parser.add_argument('--UQDF', help='UQDF data file', default=None)
+    parser.add_argument('--UTDF', help='UTDF data file', default=None)
     parser.add_argument('--out', help='path to output file', default=DEFAULT_OUT_FILE)
     parser.add_argument('--interval', help='statistic interval in second', default=None)
 
@@ -32,6 +28,10 @@ def main():
         parse_market_vs_bbo(args.market, args.CQS, args.out)
     elif args.market and args.CTS:
         parse_market_vs_trades(args.market, args.CTS, args.out)
+    elif args.market and args.UQDF:
+        parse_market_vs_bbo(args.market, args.UQDF, args.out)
+    elif args.market and args.UTDF:
+        parse_market_vs_trades(args.market, args.UTDF, args.out)
     else:
         print('Wrong arguments')
         parser.print_usage()
@@ -105,16 +105,17 @@ def parse_market_vs_quotes(quote_src, output_file, find_matched):
                         symbol_ids[s].quote_matched_count > symbol_ids[s].quote_message_count // 2]:
                 print('\t', sid)
 
-        if [s for s in symbol_ids if symbol_ids[s].quote_matched_count < int(symbol_ids[s].quote_message_count * 0.6)]:
+        if [s for s in symbol_ids if symbol_ids[s].quote_matched_count > int(symbol_ids[s].quote_message_count * 0.6)]:
             print('Symbols with matching > 60%:')
             for sid in [s for s in symbol_ids if
                         symbol_ids[s].quote_matched_count > int(symbol_ids[s].quote_message_count * 0.6)]:
                 print('\t', sid)
 
-        print('Symbols with matching > 70%:')
-        for sid in [s for s in symbol_ids if
-                    symbol_ids[s].quote_matched_count > int(symbol_ids[s].quote_message_count * 0.7)]:
-            print('\t', sid)
+        if [s for s in symbol_ids if symbol_ids[s].quote_matched_count > int(symbol_ids[s].quote_message_count * 0.7)]:
+            print('Symbols with matching > 70%:')
+            for sid in [s for s in symbol_ids if
+                        symbol_ids[s].quote_matched_count > int(symbol_ids[s].quote_message_count * 0.7)]:
+                print('\t', sid)
 
 
 if __name__ == '__main__':
