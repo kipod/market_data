@@ -21,7 +21,18 @@
                 "--date=14.10.2019",
                 "-n"
             ]
+        },
+        {
+            "name": "parse",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/parse.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--market=/mnt/data/md/2019_10_14/market_BATS-30.csv.bin",
+                "--CQS=/mnt/data/md/2019_10_14/CQS_BATS_Z-30.csv.bin",
+                "--out=/mnt/data/md/2019_10_14/BATS_CQS.csv"
+            ]
         }
-
     ]
 }
