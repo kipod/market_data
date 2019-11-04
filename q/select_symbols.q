@@ -26,11 +26,18 @@ tsymp:niceSymbols[(440;6000);atsymp]
 .ARCA.symbols:tsymp inter csymp
 .NASDAQ.symbols
 
-delete q_syms from `.
-delete z_syms from `.
-delete n_syms from `.
-delete p_syms from `.
-
+delete q_syms from `.;
+delete z_syms from `.;
+delete n_syms from `.;
+delete p_syms from `.;
+delete acsymq from `.;
+delete acsymz from `.;
+delete acsymn from `.;
+delete acsymp from `.;
+delete atsymq from `.;
+delete atsymz from `.;
+delete atsymn from `.;
+delete atsymp from `.;
 
 
 
