@@ -39,7 +39,7 @@ def main():
 
 def parse_market_vs_bbo(file_market, file_cqs, output_file):
     market_src = MarketMessages(file_market)
-    parse_market_vs_quotes(BboMessages(file_cqs), output_file, market_src.find_matched_bbo)
+
 
 
 def parse_market_vs_trades(file_market, file_trades, output_file):
