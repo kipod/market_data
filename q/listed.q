@@ -1,0 +1,4 @@
+.BATS.listed:(,/){`:symbolism.bo.ath:5001 ({[sym]select first distinct exchange by ticker from .symbolism.FullActiveFile where date within(2019.10.14;2019.10.18), ticker=sym};x)} each .BATS.symbols
+.ARCA.listed:(,/){`:symbolism.bo.ath:5001 ({[sym]select first distinct exchange by ticker from .symbolism.FullActiveFile where date within(2019.10.14;2019.10.18), ticker=sym};x)} each .ARCA.symbols
+.NASDAQ.listed:(,/){`:symbolism.bo.ath:5001 ({[sym]select first distinct exchange by ticker from .symbolism.FullActiveFile where date within(2019.10.14;2019.10.18), ticker=sym};x)} each .NASDAQ.symbols
+.NYSE.listed:(,/){`:symbolism.bo.ath:5001 ({[sym]select first distinct exchange by ticker from .symbolism.FullActiveFile where date within(2019.10.14;2019.10.18), ticker=sym};x)} each .NYSE.symbols
